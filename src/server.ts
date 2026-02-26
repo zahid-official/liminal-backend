@@ -6,8 +6,6 @@ import app from "./app.js";
 let server: Server;
 const port = envVars.PORT || 5000;
 
-console.log(envVars.DB_URL);
-
 const bootstrap = async () => {
   try {
     await mongoose.connect(envVars.DB_URL);
