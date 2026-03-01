@@ -5,11 +5,12 @@ interface EnvConfig {
   DB_URL: string;
   PORT: number;
   NODE_ENV: "development" | "production";
+  FRONTEND_URL: string;
 }
 
 // requiredEnvs Function
 const requiredEnvs = (): EnvConfig => {
-  const envKeys: string[] = ["DB_URL", "PORT", "NODE_ENV"];
+  const envKeys: string[] = ["DB_URL", "PORT", "NODE_ENV", "FRONTEND_URL"];
 
   // Check if all required environment variables are defined
   envKeys.forEach((key) => {
@@ -34,6 +35,7 @@ const requiredEnvs = (): EnvConfig => {
     DB_URL: process.env.DB_URL as string,
     PORT: assertNumber(process.env.PORT as string, "PORT"),
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
+    FRONTEND_URL: process.env.FRONTEND_URL as string,
   };
 };
 
