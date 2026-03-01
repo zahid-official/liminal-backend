@@ -6,7 +6,8 @@ import express, {
   type Response,
 } from "express";
 import envVars from "./app/configs/index.js";
-import notFoundErrorHandler from "./app/middlewares/NotFoundErrorHandler.js";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler.js";
+import notFoundErrorHandler from "./app/middlewares/notFoundErrorHandler.js";
 
 // Initialize Express app
 const app: Application = express();
@@ -27,5 +28,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // Handle not found route
 app.use(notFoundErrorHandler);
+// Handle global error
+app.use(globalErrorHandler);
 
 export default app;
