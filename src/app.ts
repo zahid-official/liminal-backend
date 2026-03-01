@@ -8,6 +8,7 @@ import express, {
 import envVars from "./app/configs/index.js";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler.js";
 import notFoundErrorHandler from "./app/middlewares/notFoundErrorHandler.js";
+import ModuleRouter from "./app/routes/index.js";
 
 // Initialize Express app
 const app: Application = express();
@@ -20,8 +21,11 @@ app.use(
     credentials: true,
   }),
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-
+// Routes setup
+app.use("/api/v1", ModuleRouter);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
