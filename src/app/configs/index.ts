@@ -6,11 +6,38 @@ interface EnvConfig {
   PORT: number;
   NODE_ENV: "development" | "production";
   FRONTEND_URL: string;
+
+  DEFAULT_ADMIN_EMAIL: string;
+  DEFAULT_ADMIN_PASSWORD: string;
+
+  BCRYPT_SALT_ROUNDS: number;
+  EXPRESS_SESSION_SECRET: string;
+
+  JWT_ACCESS_SECRET: string;
+  JWT_ACCESS_EXPIRESIN: string;
+  JWT_REFRESH_SECRET: string;
+  JWT_REFRESH_EXPIRESIN: string;
 }
 
 // requiredEnvs Function
 const requiredEnvs = (): EnvConfig => {
-  const envKeys: string[] = ["DB_URL", "PORT", "NODE_ENV", "FRONTEND_URL"];
+  const envKeys: string[] = [
+    "DB_URL",
+    "PORT",
+    "NODE_ENV",
+    "FRONTEND_URL",
+
+    "DEFAULT_ADMIN_EMAIL",
+    "DEFAULT_ADMIN_PASSWORD",
+
+    "BCRYPT_SALT_ROUNDS",
+    "EXPRESS_SESSION_SECRET",
+
+    "JWT_ACCESS_SECRET",
+    "JWT_ACCESS_EXPIRESIN",
+    "JWT_REFRESH_SECRET",
+    "JWT_REFRESH_EXPIRESIN",
+  ];
 
   // Check if all required environment variables are defined
   envKeys.forEach((key) => {
@@ -36,6 +63,20 @@ const requiredEnvs = (): EnvConfig => {
     PORT: assertNumber(process.env.PORT as string, "PORT"),
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
     FRONTEND_URL: process.env.FRONTEND_URL as string,
+
+    DEFAULT_ADMIN_EMAIL: process.env.DEFAULT_ADMIN_EMAIL as string,
+    DEFAULT_ADMIN_PASSWORD: process.env.DEFAULT_ADMIN_PASSWORD as string,
+
+    BCRYPT_SALT_ROUNDS: assertNumber(
+      process.env.BCRYPT_SALT_ROUNDS as string,
+      "BCRYPT_SALT_ROUNDS",
+    ),
+    EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
+
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
+    JWT_ACCESS_EXPIRESIN: process.env.JWT_ACCESS_EXPIRESIN as string,
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
+    JWT_REFRESH_EXPIRESIN: process.env.JWT_REFRESH_EXPIRESIN as string,
   };
 };
 
