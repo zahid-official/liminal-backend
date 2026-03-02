@@ -1,5 +1,22 @@
 import { model, Schema } from "mongoose";
-import { UserRole, UserStatus, type IUser } from "./user.interface.js";
+import {
+  UserRole,
+  UserStatus,
+  type IAuthProvider,
+  type IUser,
+} from "./user.interface.js";
+
+// Define the authentication provider sub-schema
+const authSchema = new Schema<IAuthProvider>(
+  {
+    provider: { type: "String", required: true },
+    providerId: { type: "String", required: true },
+  },
+  {
+    versionKey: false,
+    _id: false,
+  },
+);
 
 // Define the User schema
 const userSchema = new Schema<IUser>(
@@ -12,6 +29,7 @@ const userSchema = new Schema<IUser>(
     picture: { type: String },
     isDeleted: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
+    auth: [authSchema],
     role: {
       type: String,
       enum: Object.values(UserRole),
