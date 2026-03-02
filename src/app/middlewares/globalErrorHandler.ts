@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import { httpStatus } from "../imports/index.js";
+import { ZodError } from "zod";
 import envVars from "../configs/index.js";
+import { httpStatus } from "../imports/index.js";
 
 // globalErrorHandler Function
 const globalErrorHandler = (
@@ -19,11 +20,25 @@ const globalErrorHandler = (
   let message = error.message || "Something went wrong!";
   let errorDetails = error;
 
+  // Handle Zod validation errors
+  if (error instanceof ZodError) {
+    statusCode = httpStatus.BAD_REQUEST;
+    message = "Zod validation error";
+    errorDetails = error.issues;
+  }
+
   // Send the error response
   res.status(statusCode).json({
+    success: false,
     message,
     error: errorDetails,
-    stack: envVars.NODE_ENV === "development" ? error.stack : null,
+    stack:
+      envVars.NODE_ENV === "development"
+        ? error.stack
+            ?.split("\n")
+            .map((line: any) => line.trim())
+            .filter((line: any) => line.startsWith("at"))
+        : null,
   });
 };
 
