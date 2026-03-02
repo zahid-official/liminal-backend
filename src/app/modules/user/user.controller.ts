@@ -6,8 +6,8 @@ import { httpStatus } from "../../imports/index.js";
 
 // Create user
 const createUser = catchAsync(async (req: Request, res: Response) => {
-  const { password, ...body } = req?.body || {};
-  const result = await UserService.createUser(body, password);
+  const { password, ...payload } = req?.body || {};
+  const result = await UserService.createUser(payload, password);
 
   // Send response
   sendResponse(res, {
