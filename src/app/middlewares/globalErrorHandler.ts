@@ -23,8 +23,20 @@ const globalErrorHandler = (
   // Handle Zod validation errors
   if (error instanceof ZodError) {
     statusCode = httpStatus.BAD_REQUEST;
-    message = "Zod validation error";
+    message = "Validation error. Please check the input data.";
     errorDetails = error.issues;
+  }
+
+  // Handle MongoDB duplicate key errors
+  else if (error.code === 11000) {
+    statusCode = httpStatus.BAD_REQUEST;
+    message = `${Object.values(error.keyValue)} is already associated with an existing one. Please use another value.`;
+  }
+
+  // Handle MongoDB CastError for invalid ObjectIDs
+  else if (error.name === "CastError") {
+    statusCode = httpStatus.BAD_REQUEST;
+    message = "Invalid ObjectID. Please provide a valid MongoDB ObjectID";
   }
 
   // Send the error response
