@@ -13,10 +13,12 @@ interface EnvConfig {
   BCRYPT_SALT_ROUNDS: number;
   EXPRESS_SESSION_SECRET: string;
 
-  JWT_ACCESS_SECRET: string;
-  JWT_ACCESS_EXPIRESIN: string;
-  JWT_REFRESH_SECRET: string;
-  JWT_REFRESH_EXPIRESIN: string;
+  JWT: {
+    ACCESS_SECRET: string;
+    ACCESS_EXPIRESIN: string;
+    REFRESH_SECRET: string;
+    REFRESH_EXPIRESIN: string;
+  };
 }
 
 // requiredEnvs Function
@@ -73,10 +75,12 @@ const requiredEnvs = (): EnvConfig => {
     ),
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
 
-    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
-    JWT_ACCESS_EXPIRESIN: process.env.JWT_ACCESS_EXPIRESIN as string,
-    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
-    JWT_REFRESH_EXPIRESIN: process.env.JWT_REFRESH_EXPIRESIN as string,
+    JWT: {
+      ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
+      ACCESS_EXPIRESIN: process.env.JWT_ACCESS_EXPIRESIN as string,
+      REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
+      REFRESH_EXPIRESIN: process.env.JWT_REFRESH_EXPIRESIN as string,
+    },
   };
 };
 
