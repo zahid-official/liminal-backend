@@ -36,9 +36,7 @@ passport.use(
           return done(null, false, { message: "Invalid email or password" });
         }
 
-        // Exclude the password field
-        const { password: _password, ...safeUser } = user.toObject();
-        return done(null, safeUser);
+        return done(null, user);
       } catch (error) {
         return done(error);
       }
