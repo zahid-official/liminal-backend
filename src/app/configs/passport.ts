@@ -4,10 +4,11 @@ import User from "../modules/user/user.model.js";
 import { UserStatus } from "../modules/user/user.interface.js";
 import bcrypt from "bcryptjs";
 
+// Configure the local strategy for Passport
 passport.use(
   new LocalStrategy(
     { usernameField: "email", passwordField: "password" },
-    async (email: string, password: string, done: any) => {
+    async (email: string, password: string, done) => {
       try {
         // Find the user by email
         const user = await User.findOne({ email });
@@ -30,12 +31,12 @@ passport.use(
         }
 
         // Compare the provided password with the stored hashed password
-        const matchPassword = await bcrypt.compare(password, user.password);
-        if (!matchPassword) {
+        const isPasswordMatched = await bcrypt.compare(password, user.password);
+        if (!isPasswordMatched) {
           return done(null, false, { message: "Invalid email or password" });
         }
 
-        // Exclude the password field from the user object before returning it
+        // Exclude the password field
         const { password: _password, ...safeUser } = user.toObject();
         return done(null, safeUser);
       } catch (error) {
@@ -44,3 +45,22 @@ passport.use(
     },
   ),
 );
+
+// Serialize the user to store in the session
+passport.serializeUser((user: any, done) => {
+  return done(null, user._id);
+});
+
+// Deserialize the user from the session
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      return done(null, false);
+    }
+
+    return done(null, user);
+  } catch (error) {
+    return done(error);
+  }
+});
