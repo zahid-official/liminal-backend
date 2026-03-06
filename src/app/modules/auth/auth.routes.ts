@@ -9,7 +9,7 @@ const router = Router();
 // Get routes
 router.get("/google", AuthController.googleLogin);
 router.get(
-  "/auth/google/callback",
+  "/google/callback",
   passport.authenticate("google", {
     failureRedirect: `${envVars.FRONTEND_URL}/login?errorMessage=There was an error during Google authentication. Please try again.`,
   }),

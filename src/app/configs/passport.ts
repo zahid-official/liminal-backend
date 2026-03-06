@@ -37,7 +37,10 @@ passport.use(
         }
 
         // Compare the provided password with the stored hashed password
-        const isPasswordMatched = await bcrypt.compare(password, user.password);
+        const isPasswordMatched = await bcrypt.compare(
+          password,
+          user.password as string,
+        );
         if (!isPasswordMatched) {
           return done(null, false, { message: "Invalid email or password" });
         }
