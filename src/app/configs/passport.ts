@@ -104,8 +104,8 @@ passport.use(
             name,
             role: UserRole.USER,
             isVerified: true,
+            picture: profilePicture ?? "",
             auth: [{ provider: "google", providerId: googleId }],
-            ...(profilePicture ? { picture: profilePicture } : {}),
           };
 
           // Create the user in the database

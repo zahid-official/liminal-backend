@@ -1,11 +1,24 @@
 import type { NextFunction, Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync.js";
 import passport from "passport";
 import AppError from "../../errors/AppError.js";
 import { httpStatus } from "../../imports/index.js";
-import getTokens from "../../utils/getTokens.js";
+import catchAsync from "../../utils/catchAsync.js";
 import { clearCookies, setCookies } from "../../utils/cookies.js";
+import getTokens from "../../utils/getTokens.js";
 import sendResponse from "../../utils/sendResponse.js";
+
+// Google login handler
+const googleLogin = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const redirect = (req?.query?.redirect as string) || "/";
+
+    // Initiate Google authentication with Passport
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      state: redirect,
+    })(req, res, next);
+  },
+);
 
 // Credentials login
 const credentialsLogin = catchAsync(
@@ -97,6 +110,7 @@ const logout = catchAsync(
 
 // Auth controller object
 const AuthController = {
+  googleLogin,
   credentialsLogin,
   logout,
 };
