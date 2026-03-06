@@ -16,7 +16,7 @@ const credentialsLogin = catchAsync(
         return next(
           new AppError(
             httpStatus.UNAUTHORIZED,
-            info.message || "Authentication failed",
+            info?.message || "Authentication failed",
           ),
         );
       }
@@ -26,25 +26,34 @@ const credentialsLogin = catchAsync(
         return next(
           new AppError(
             httpStatus.UNAUTHORIZED,
-            info.message || "Invalid credentials",
+            info?.message || "Invalid credentials",
           ),
         );
       }
 
-      // Generate tokens and set cookies
-      const tokens = getTokens(user);
-      setCookies(res, tokens);
+      // Login the user & complete the authentication process
+      req.logIn(user, (loginError: any) => {
+        if (loginError) {
+          return next(
+            new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Login failed"),
+          );
+        }
 
-      // Exclude sensitive information from the user object
-      const result = user.toObject();
-      delete result.password;
+        // Generate tokens and set cookies
+        const tokens = getTokens(user);
+        setCookies(res, tokens);
 
-      // Send response
-      sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "Credentials login successful",
-        data: result,
+        // Exclude sensitive information from the user object
+        const result = user.toObject();
+        delete result.password;
+
+        // Send response
+        sendResponse(res, {
+          success: true,
+          statusCode: httpStatus.OK,
+          message: "Credentials login successful",
+          data: result,
+        });
       });
     })(req, res, next);
   },
