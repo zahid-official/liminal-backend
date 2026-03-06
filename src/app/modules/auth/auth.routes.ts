@@ -6,6 +6,7 @@ const router = Router();
 
 // Post routes
 router.post("/login", AuthController.credentialsLogin);
+router.post("/logout", AuthController.logout);
 
 // Export auth routes
 const AuthRoutes: Router = router;

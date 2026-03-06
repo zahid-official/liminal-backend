@@ -4,7 +4,7 @@ import passport from "passport";
 import AppError from "../../errors/AppError.js";
 import { httpStatus } from "../../imports/index.js";
 import getTokens from "../../utils/getTokens.js";
-import { setCookies } from "../../utils/cookies.js";
+import { clearCookies, setCookies } from "../../utils/cookies.js";
 import sendResponse from "../../utils/sendResponse.js";
 
 // Credentials login
@@ -59,9 +59,46 @@ const credentialsLogin = catchAsync(
   },
 );
 
+// Logout user
+const logout = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Logout the user
+    req.logout((error) => {
+      if (error) {
+        return next(
+          new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Logout failed"),
+        );
+      }
+
+      req.session.destroy((sessionError) => {
+        if (sessionError) {
+          return next(
+            new AppError(
+              httpStatus.INTERNAL_SERVER_ERROR,
+              "Session destruction failed",
+            ),
+          );
+        }
+
+        // Clear cookies
+        clearCookies(res);
+
+        // Send response
+        sendResponse(res, {
+          success: true,
+          statusCode: httpStatus.OK,
+          message: "User logged out successfully",
+          data: null,
+        });
+      });
+    });
+  },
+);
+
 // Auth controller object
 const AuthController = {
   credentialsLogin,
+  logout,
 };
 
 export default AuthController;

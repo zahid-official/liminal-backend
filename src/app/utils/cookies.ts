@@ -10,8 +10,9 @@ interface IAuthTokens {
 // Cookie options
 const cookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: true,
+  secure: envVars.NODE_ENV === "production",
   sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
 };
 
 // Set cookies function
@@ -37,6 +38,7 @@ const setCookies = (res: Response, tokenInfo: IAuthTokens) => {
 const clearCookies = (res: Response) => {
   res.clearCookie("accessToken", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
+  res.clearCookie("connect.sid", { path: "/" });
 };
 
 export { setCookies, clearCookies };
