@@ -1,13 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
+import catchAsync from "../../utils/catchAsync.js";
 import passport from "passport";
 import AppError from "../../errors/AppError.js";
 import { httpStatus } from "../../imports/index.js";
-import catchAsync from "../../utils/catchAsync.js";
-import { clearCookies, setCookies } from "../../utils/cookies.js";
 import getTokens from "../../utils/getTokens.js";
+import { clearCookies, setCookies } from "../../utils/cookies.js";
 import sendResponse from "../../utils/sendResponse.js";
+import envVars from "../../configs/index.js";
 
-// Google login handler
+// Google login
 const googleLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const redirect = (req?.query?.redirect as string) || "/";
@@ -17,6 +18,33 @@ const googleLogin = catchAsync(
       scope: ["profile", "email"],
       state: redirect,
     })(req, res, next);
+  },
+);
+
+// Google login callback
+const googleLoginCallback = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+
+    // Extract the redirect path from the state parameter
+    let redirect = req.query.state ? (req.query.state as string) : "";
+    if (redirect.startsWith("/")) {
+      redirect = redirect.slice(1);
+    }
+
+    // Handle authentication failure
+    if (!user) {
+      return next(
+        new AppError(httpStatus.UNAUTHORIZED, "Google authentication failed"),
+      );
+    }
+
+    // Generate tokens and set cookies
+    const tokens = getTokens(user);
+    setCookies(res, tokens);
+
+    // Redirect the user to the specified path or the homepage
+    res.redirect(`${envVars.FRONTEND_URL}/${redirect}`);
   },
 );
 
@@ -111,6 +139,7 @@ const logout = catchAsync(
 // Auth controller object
 const AuthController = {
   googleLogin,
+  googleLoginCallback,
   credentialsLogin,
   logout,
 };
