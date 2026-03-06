@@ -1,8 +1,14 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import {
+  Strategy as GoogleStrategy,
+  type Profile,
+  type VerifyCallback,
+} from "passport-google-oauth20";
 import User from "../modules/user/user.model.js";
-import { UserStatus } from "../modules/user/user.interface.js";
+import { UserRole, UserStatus } from "../modules/user/user.interface.js";
 import bcrypt from "bcryptjs";
+import envVars from "./index.js";
 
 // Configure the local strategy for Passport
 passport.use(
@@ -17,14 +23,14 @@ passport.use(
         }
 
         // Check if the user is marked as deleted
-        if (user.isDeleted) {
+        if (user?.isDeleted) {
           return done(null, false, {
             message: `User is deleted. Please contact support for more information.`,
           });
         }
 
         // Check if the user is blocked
-        if (user.status === UserStatus.BLOCKED) {
+        if (user?.status === UserStatus.BLOCKED) {
           return done(null, false, {
             message: `User is ${user.status}. Please contact support for more information.`,
           });
@@ -34,6 +40,76 @@ passport.use(
         const isPasswordMatched = await bcrypt.compare(password, user.password);
         if (!isPasswordMatched) {
           return done(null, false, { message: "Invalid email or password" });
+        }
+
+        return done(null, user);
+      } catch (error) {
+        return done(error);
+      }
+    },
+  ),
+);
+
+// Configure the Google strategy for Passport
+passport.use(
+  new GoogleStrategy(
+    // Google OAuth configuration
+    {
+      clientID: envVars.GOOGLE.CLIENT_ID,
+      clientSecret: envVars.GOOGLE.CLIENT_SECRET,
+      callbackURL: envVars.GOOGLE.CALLBACK_URL,
+      proxy: true,
+    },
+
+    // Verification callback function
+    async (
+      accessToken: string,
+      refreshToken: string,
+      profile: Profile,
+      done: VerifyCallback,
+    ) => {
+      try {
+        // Extract relevant information from the Google profile
+        const email = profile.emails?.[0]?.value;
+        const googleId = profile.id;
+        const name = profile.displayName;
+        const profilePicture = profile.photos?.[0]?.value;
+
+        // Check if the email is available in the profile
+        if (!email) {
+          return done(null, false, { message: "Email not found" });
+        }
+
+        // Find the user by email
+        let user = await User.findOne({ email });
+
+        // Check if the user is marked as deleted
+        if (user && user.isDeleted) {
+          return done(null, false, {
+            message: `User is deleted. Please contact support for more information.`,
+          });
+        }
+
+        // Check if the user is blocked
+        if (user && user.status === UserStatus.BLOCKED) {
+          return done(null, false, {
+            message: `User is ${user.status}. Please contact support for more information.`,
+          });
+        }
+
+        // If the user doesn't exist, create a new user
+        if (!user) {
+          const payload = {
+            email,
+            name,
+            role: UserRole.USER,
+            isVerified: true,
+            auth: [{ provider: "google", providerId: googleId }],
+            ...(profilePicture ? { picture: profilePicture } : {}),
+          };
+
+          // Create the user in the database
+          user = await User.create(payload);
         }
 
         return done(null, user);
