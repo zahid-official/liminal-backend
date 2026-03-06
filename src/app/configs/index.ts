@@ -19,6 +19,12 @@ interface EnvConfig {
     REFRESH_SECRET: string;
     REFRESH_EXPIRESIN: string;
   };
+
+  GOOGLE: {
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+    CALLBACK_URL: string;
+  };
 }
 
 // requiredEnvs Function
@@ -39,6 +45,10 @@ const requiredEnvs = (): EnvConfig => {
     "JWT_ACCESS_EXPIRESIN",
     "JWT_REFRESH_SECRET",
     "JWT_REFRESH_EXPIRESIN",
+
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "GOOGLE_CALLBACK_URL",
   ];
 
   // Check if all required environment variables are defined
@@ -80,6 +90,12 @@ const requiredEnvs = (): EnvConfig => {
       ACCESS_EXPIRESIN: process.env.JWT_ACCESS_EXPIRESIN as string,
       REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
       REFRESH_EXPIRESIN: process.env.JWT_REFRESH_EXPIRESIN as string,
+    },
+
+    GOOGLE: {
+      CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
+      CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+      CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     },
   };
 };

@@ -9,6 +9,9 @@ import envVars from "./app/configs/index.js";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler.js";
 import notFoundErrorHandler from "./app/middlewares/notFoundErrorHandler.js";
 import ModuleRouter from "./app/routes/index.js";
+import "./app/configs/passport.js";
+import session from "express-session";
+import passport from "passport";
 
 // Initialize Express app
 const app: Application = express();
@@ -23,6 +26,17 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Session & Passport middleware setup
+app.use(
+  session({
+    secret: envVars.EXPRESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes setup
 app.use("/api/v1", ModuleRouter);
