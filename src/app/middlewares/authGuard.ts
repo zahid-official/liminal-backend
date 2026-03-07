@@ -3,7 +3,7 @@ import type { JwtPayload } from "jsonwebtoken";
 import envVars from "../configs/index.js";
 import AppError from "../errors/AppError.js";
 import { httpStatus } from "../imports/index.js";
-import { UserStatus } from "../modules/user/user.interface.js";
+import { AccountStatus } from "../modules/user/user.interface.js";
 import User from "../modules/user/user.model.js";
 import catchAsync from "../utils/catchAsync.js";
 import { verifyJWT } from "../utils/jwt.js";
@@ -49,7 +49,7 @@ const authGuard = (...allowedRoles: string[]) => {
     }
 
     // Check if user is blocked
-    if (user.status === UserStatus.BLOCKED) {
+    if (user.status === AccountStatus.BLOCKED) {
       throw new AppError(
         httpStatus.UNAUTHORIZED,
         `User is ${user.status}. Please contact support for more information.`,

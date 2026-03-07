@@ -1,9 +1,9 @@
 import { Router } from "express";
 import schemaValidator from "../../middlewares/schemaValidator.js";
 import UserController from "./user.controller.js";
-import { createUserSchema } from "./user.validation.js";
+import { createUserSchema, updateUserSchema } from "./user.validation.js";
 import authGuard from "../../middlewares/authGuard.js";
-import { UserRole } from "./user.interface.js";
+import { Role } from "./user.interface.js";
 
 // Initialize router
 const router = Router();
@@ -11,7 +11,7 @@ const router = Router();
 // Get routes
 router.get(
   "/singleUser/:id",
-  authGuard(UserRole.ADMIN),
+  authGuard(Role.ADMIN),
   UserController.getSingleUser,
 );
 
@@ -20,6 +20,14 @@ router.post(
   "/create",
   schemaValidator(createUserSchema),
   UserController.createUser,
+);
+
+// Patch routes
+router.patch(
+  "/:id",
+  authGuard(Role.ADMIN),
+  schemaValidator(updateUserSchema),
+  UserController.updateUser,
 );
 
 // Export user routes
