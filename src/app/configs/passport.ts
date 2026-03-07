@@ -6,7 +6,7 @@ import {
   type VerifyCallback,
 } from "passport-google-oauth20";
 import User from "../modules/user/user.model.js";
-import { UserRole, UserStatus } from "../modules/user/user.interface.js";
+import { Role, AccountStatus } from "../modules/user/user.interface.js";
 import bcrypt from "bcryptjs";
 import envVars from "./index.js";
 
@@ -30,14 +30,17 @@ passport.use(
         }
 
         // Check if the user is blocked
-        if (user?.status === UserStatus.BLOCKED) {
+        if (user?.status === AccountStatus.BLOCKED) {
           return done(null, false, {
             message: `User is ${user.status}. Please contact support for more information.`,
           });
         }
 
         // Compare the provided password with the stored hashed password
-        const isPasswordMatched = await bcrypt.compare(password, user.password);
+        const isPasswordMatched = await bcrypt.compare(
+          password,
+          user.password as string,
+        );
         if (!isPasswordMatched) {
           return done(null, false, { message: "Invalid email or password" });
         }
@@ -91,7 +94,7 @@ passport.use(
         }
 
         // Check if the user is blocked
-        if (user && user.status === UserStatus.BLOCKED) {
+        if (user && user.status === AccountStatus.BLOCKED) {
           return done(null, false, {
             message: `User is ${user.status}. Please contact support for more information.`,
           });
@@ -102,10 +105,10 @@ passport.use(
           const payload = {
             email,
             name,
-            role: UserRole.USER,
+            role: Role.USER,
             isVerified: true,
+            picture: profilePicture ?? "",
             auth: [{ provider: "google", providerId: googleId }],
-            ...(profilePicture ? { picture: profilePicture } : {}),
           };
 
           // Create the user in the database
