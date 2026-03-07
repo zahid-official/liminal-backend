@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync.js";
-import UserService from "./user.service.js";
-import sendResponse from "../../utils/sendResponse.js";
 import { httpStatus } from "../../imports/index.js";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import UserService from "./user.service.js";
 
 // Create user
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -18,9 +18,24 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get single user
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params?.id as string;
+  const result = await UserService.getSingleUser(userId);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "User retrieved successfully",
+    data: result,
+  });
+});
+
 // User controller object
 const UserController = {
   createUser,
+  getSingleUser,
 };
 
 export default UserController;

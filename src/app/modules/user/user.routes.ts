@@ -6,6 +6,9 @@ import schemaValidator from "../../middlewares/schemaValidator.js";
 // Initialize router
 const router = Router();
 
+// Get routes
+router.get("/singleUser/:id", UserController.getSingleUser);
+
 // Post routes
 router.post(
   "/create",

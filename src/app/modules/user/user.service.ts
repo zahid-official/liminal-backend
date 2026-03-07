@@ -39,9 +39,20 @@ const createUser = async (payload: IUser, password: string) => {
   return result;
 };
 
+// Get single user
+const getSingleUser = async (userId: string) => {
+  const user = await User.findById(userId).select("-password");
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return user;
+};
+
 // User service object
 const UserService = {
   createUser,
+  getSingleUser,
 };
 
 export default UserService;
