@@ -7,11 +7,11 @@ export interface IAuthProvider {
 }
 
 // Define user roles and statuses
-export enum UserRole {
+export enum Role {
   USER = "USER",
   ADMIN = "ADMIN",
 }
-export enum UserStatus {
+export enum AccountStatus {
   ACTIVE = "ACTIVE",
   BLOCKED = "BLOCKED",
 }
@@ -21,7 +21,7 @@ export interface IUser {
   _id?: Types.ObjectId;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   phone?: string;
   address?: string;
   picture?: string;
@@ -29,6 +29,6 @@ export interface IUser {
   isDeleted?: boolean;
   isVerified?: boolean;
   auth: IAuthProvider[];
-  role: UserRole;
-  status: UserStatus;
+  role: Role;
+  status: AccountStatus;
 }
