@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import catchAsync from "../utils/catchAsync.js";
 import type { ZodObject } from "zod";
 
-// schemaValidator Function
+// It's a high-order function that returns a schemaValidator middleware function
 const schemaValidator = (schema: ZodObject) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // If the request body contains a "data" property, use it as the new request body

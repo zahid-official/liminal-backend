@@ -39,6 +39,15 @@ const globalErrorHandler = (
     message = "Invalid ObjectID. Please provide a valid MongoDB ObjectID";
   }
 
+  // JWT error handling
+  else if (
+    error.name === "JsonWebTokenError" ||
+    error.name === "TokenExpiredError"
+  ) {
+    statusCode = httpStatus.UNAUTHORIZED;
+    message = error.message;
+  }
+
   // Send the error response
   res.status(statusCode).json({
     success: false,
