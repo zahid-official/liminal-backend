@@ -25,6 +25,12 @@ interface EnvConfig {
     CLIENT_SECRET: string;
     CALLBACK_URL: string;
   };
+
+  CLOUDINARY: {
+    API_KEY: string;
+    API_SECRET: string;
+    CLOUD_NAME: string;
+  };
 }
 
 // requiredEnvs Function
@@ -49,6 +55,10 @@ const requiredEnvs = (): EnvConfig => {
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "GOOGLE_CALLBACK_URL",
+
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET",
+    "CLOUDINARY_CLOUD_NAME",
   ];
 
   // Check if all required environment variables are defined
@@ -96,6 +106,12 @@ const requiredEnvs = (): EnvConfig => {
       CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
       CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
       CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
+    },
+
+    CLOUDINARY: {
+      API_KEY: process.env.CLOUDINARY_API_KEY as string,
+      API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+      CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
     },
   };
 };

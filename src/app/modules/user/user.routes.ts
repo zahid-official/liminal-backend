@@ -4,6 +4,7 @@ import UserController from "./user.controller.js";
 import { createUserSchema, updateUserSchema } from "./user.validation.js";
 import authGuard from "../../middlewares/authGuard.js";
 import { Role } from "./user.interface.js";
+import multerUpload from "../../middlewares/multer.js";
 
 // Initialize router
 const router = Router();
@@ -26,6 +27,7 @@ router.post(
 router.patch(
   "/:id",
   authGuard(Role.ADMIN),
+  multerUpload.single("file"),
   schemaValidator(updateUserSchema),
   UserController.updateUser,
 );
