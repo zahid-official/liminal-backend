@@ -24,7 +24,11 @@ const storage = new CloudinaryStorage({
       "-" +
       fileName;
 
-    return uniqueFileName;
+    return {
+      folder: "liminalImages",
+      public_id: uniqueFileName,
+      resource_type: "auto",
+    };
   },
 });
 

@@ -2,9 +2,10 @@ import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import envVars from "../configs/index.js";
 import { httpStatus } from "../imports/index.js";
+import { cloudinaryDelete } from "../configs/cloudinary.js";
 
 // globalErrorHandler Function
-const globalErrorHandler = (
+const globalErrorHandler = async (
   error: any,
   req: Request,
   res: Response,
@@ -19,6 +20,20 @@ const globalErrorHandler = (
   let statusCode = error.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
   let message = error.message || "Something went wrong!";
   let errorDetails = error;
+
+  // Delete single uploaded file from cloudinary
+  if (req.file) {
+    await cloudinaryDelete(req.file.path);
+  }
+
+  // Delete multiple uploaded files from cloudinary
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    await Promise.all(
+      (req.files as Express.Multer.File[]).map((file) =>
+        cloudinaryDelete(file.path),
+      ),
+    );
+  }
 
   // Handle Zod validation errors
   if (error instanceof ZodError) {
