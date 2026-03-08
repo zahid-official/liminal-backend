@@ -3,6 +3,7 @@ import { httpStatus } from "../../imports/index.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import UserService from "./user.service.js";
+import type { IUser } from "./user.interface.js";
 
 // Create user
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -36,7 +37,7 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params?.id as string;
   const decodedToken = req?.decodedToken;
-  const body = req?.body;
+  const body: IUser = { ...req?.body, picture: req.file?.path };
   const result = await UserService.updateUser(userId, decodedToken, body);
 
   // Send response
