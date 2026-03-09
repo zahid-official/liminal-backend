@@ -42,6 +42,12 @@ const createUser = async (payload: IUser, password: string) => {
   return result;
 };
 
+// Get all users
+const getAllUsers = async () => {
+  const users = await User.find().select("-password");
+  return users;
+};
+
 // Get single user
 const getSingleUser = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
@@ -157,6 +163,7 @@ const deleteUser = async (userId: string) => {
 // User service object
 const UserService = {
   createUser,
+  getAllUsers,
   getSingleUser,
   getProfileInfo,
   updateUser,

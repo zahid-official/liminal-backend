@@ -2,8 +2,8 @@ import type { Request, Response } from "express";
 import { httpStatus } from "../../imports/index.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
-import UserService from "./user.service.js";
 import type { IUser } from "./user.interface.js";
+import UserService from "./user.service.js";
 
 // Create user
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -15,6 +15,19 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: httpStatus.CREATED,
     message: "User created successfully",
+    data: result,
+  });
+});
+
+// Get all users
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAllUsers();
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Users retrieved successfully",
     data: result,
   });
 });
@@ -80,6 +93,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 // User controller object
 const UserController = {
   createUser,
+  getAllUsers,
   getSingleUser,
   getProfileInfo,
   updateUser,

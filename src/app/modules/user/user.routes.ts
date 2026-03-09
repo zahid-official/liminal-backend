@@ -10,13 +10,12 @@ import multerUpload from "../../middlewares/multer.js";
 const router = Router();
 
 // Get routes
+router.get("/", authGuard(Role.ADMIN), UserController.getAllUsers);
 router.get(
   "/singleUser/:id",
   authGuard(Role.ADMIN),
   UserController.getSingleUser,
 );
-
-// Get profile info
 router.get(
   "/profile",
   authGuard(...Object.values(Role)),
