@@ -52,6 +52,17 @@ const getSingleUser = async (userId: string) => {
   return user;
 };
 
+// Get profile info
+const getProfileInfo = async (userId: string) => {
+  const user = await User.findById(userId).select("-password");
+  // Check if user exists
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return user;
+};
+
 // Update user
 const updateUser = async (
   userId: string,
@@ -147,6 +158,7 @@ const deleteUser = async (userId: string) => {
 const UserService = {
   createUser,
   getSingleUser,
+  getProfileInfo,
   updateUser,
   deleteUser,
 };

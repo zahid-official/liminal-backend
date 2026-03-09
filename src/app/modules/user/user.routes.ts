@@ -16,6 +16,13 @@ router.get(
   UserController.getSingleUser,
 );
 
+// Get profile info
+router.get(
+  "/profile",
+  authGuard(...Object.values(Role)),
+  UserController.getProfileInfo,
+);
+
 // Post routes
 router.post(
   "/create",

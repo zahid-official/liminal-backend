@@ -33,6 +33,20 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get profile info
+const getProfileInfo = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.decodedToken?.userId as string;
+  const result = await UserService.getProfileInfo(userId);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Profile information retrieved successfully",
+    data: result,
+  });
+});
+
 // Update user
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params?.id as string;
@@ -67,6 +81,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 const UserController = {
   createUser,
   getSingleUser,
+  getProfileInfo,
   updateUser,
   deleteUser,
 };
