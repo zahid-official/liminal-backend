@@ -32,6 +32,9 @@ router.patch(
   UserController.updateUser,
 );
 
+// Delete routes
+router.delete("/:id", authGuard(Role.ADMIN), UserController.deleteUser);
+
 // Export user routes
 const UserRoutes: Router = router;
 export default UserRoutes;

@@ -129,11 +129,26 @@ const updateUser = async (
   }
 };
 
+// Delete user
+const deleteUser = async (userId: string) => {
+  const user = await User.findByIdAndDelete(userId);
+
+  // Check if user exists
+  if (!user) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "User not found. Deletion failed.",
+    );
+  }
+  return user;
+};
+
 // User service object
 const UserService = {
   createUser,
   getSingleUser,
   updateUser,
+  deleteUser,
 };
 
 export default UserService;
