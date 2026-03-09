@@ -42,9 +42,26 @@ const createUser = async (payload: IUser, password: string) => {
   return result;
 };
 
+// Get all users
+const getAllUsers = async () => {
+  const users = await User.find().select("-password");
+  return users;
+};
+
 // Get single user
 const getSingleUser = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return user;
+};
+
+// Get profile info
+const getProfileInfo = async (userId: string) => {
+  const user = await User.findById(userId).select("-password");
+  // Check if user exists
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -129,11 +146,28 @@ const updateUser = async (
   }
 };
 
+// Delete user
+const deleteUser = async (userId: string) => {
+  const user = await User.findByIdAndDelete(userId);
+
+  // Check if user exists
+  if (!user) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "User not found. Deletion failed.",
+    );
+  }
+  return user;
+};
+
 // User service object
 const UserService = {
   createUser,
+  getAllUsers,
   getSingleUser,
+  getProfileInfo,
   updateUser,
+  deleteUser,
 };
 
 export default UserService;

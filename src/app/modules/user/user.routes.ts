@@ -10,10 +10,16 @@ import multerUpload from "../../middlewares/multer.js";
 const router = Router();
 
 // Get routes
+router.get("/", authGuard(Role.ADMIN), UserController.getAllUsers);
 router.get(
   "/singleUser/:id",
   authGuard(Role.ADMIN),
   UserController.getSingleUser,
+);
+router.get(
+  "/profile",
+  authGuard(...Object.values(Role)),
+  UserController.getProfileInfo,
 );
 
 // Post routes
@@ -31,6 +37,9 @@ router.patch(
   schemaValidator(updateUserSchema),
   UserController.updateUser,
 );
+
+// Delete routes
+router.delete("/:id", authGuard(Role.ADMIN), UserController.deleteUser);
 
 // Export user routes
 const UserRoutes: Router = router;
