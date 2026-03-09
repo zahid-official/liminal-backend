@@ -2,8 +2,8 @@ import type { Request, Response } from "express";
 import { httpStatus } from "../../imports/index.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
-import UserService from "./user.service.js";
 import type { IUser } from "./user.interface.js";
+import UserService from "./user.service.js";
 
 // Create user
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -19,6 +19,19 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get all users
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAllUsers();
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Users retrieved successfully",
+    data: result,
+  });
+});
+
 // Get single user
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params?.id as string;
@@ -29,6 +42,20 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: httpStatus.CREATED,
     message: "User retrieved successfully",
+    data: result,
+  });
+});
+
+// Get profile info
+const getProfileInfo = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.decodedToken?.userId as string;
+  const result = await UserService.getProfileInfo(userId);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Profile information retrieved successfully",
     data: result,
   });
 });
@@ -49,11 +76,28 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Delete user
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params?.id as string;
+  const result = await UserService.deleteUser(userId);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User deleted successfully",
+    data: result,
+  });
+});
+
 // User controller object
 const UserController = {
   createUser,
+  getAllUsers,
   getSingleUser,
+  getProfileInfo,
   updateUser,
+  deleteUser,
 };
 
 export default UserController;
