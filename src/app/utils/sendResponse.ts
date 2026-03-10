@@ -4,8 +4,8 @@ import type { Response } from "express";
 export interface IMeta {
   page: number;
   limit: number;
+  total: number;
   totalPage: number;
-  totalDocs: number;
 }
 
 // Payload interface

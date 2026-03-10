@@ -4,12 +4,9 @@ import type { IMeta } from "./sendResponse.js";
 // Utility class to build Mongoose queries based on request query parameters
 class QueryBuilder<T> {
   constructor(
-    public modelQuery: Query<T[], T>,
-    public readonly query: Record<string, any>,
-  ) {
-    this.modelQuery = modelQuery;
-    this.query = query;
-  }
+    private modelQuery: Query<T[], T>,
+    public readonly query: Record<string, unknown>,
+  ) {}
 
   // Search by term in specified fields
   search(searchFields: string[]): this {
@@ -65,6 +62,11 @@ class QueryBuilder<T> {
     return this;
   }
 
+  // Return the built query for execution
+  build(): Query<T[], T> {
+    return this.modelQuery;
+  }
+
   // Get the pagination metadata
   async meta(): Promise<IMeta> {
     const allQueries = this.modelQuery.getFilter();
@@ -72,13 +74,13 @@ class QueryBuilder<T> {
     const totalDocs = await this.modelQuery.model.countDocuments(allQueries);
     const page = Number(this.query?.page) || 1;
     const limit = Number(this.query?.limit) || 9;
-    const totalPages = Math.ceil(totalDocs / limit);
+    const totalPage = Math.ceil(totalDocs / limit);
 
     return {
       page,
       limit,
-      totalPage: totalPages,
-      totalDocs,
+      total: totalDocs,
+      totalPage,
     };
   }
 }
