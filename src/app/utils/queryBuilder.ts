@@ -32,6 +32,15 @@ class QueryBuilder<T> {
     this.modelQuery = this.modelQuery.find(queryObj);
     return this;
   }
+
+  // Sort results based on query parameter (default to createdAt desc)
+  sort(): this {
+    const sort =
+      (this.query?.sort as string)?.split(",").join(" ") || "-createdAt";
+
+    this.modelQuery = this.modelQuery.sort(sort);
+    return this;
+  }
 }
 
 export default QueryBuilder;
