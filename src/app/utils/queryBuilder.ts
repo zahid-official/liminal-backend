@@ -41,6 +41,14 @@ class QueryBuilder<T> {
     this.modelQuery = this.modelQuery.sort(sort);
     return this;
   }
+
+  // Select specific fields based on query parameter
+  fields(): this {
+    const fields = (this.query?.fields as string)?.split(",").join(" ") || "";
+
+    this.modelQuery = this.modelQuery.select(fields);
+    return this;
+  }
 }
 
 export default QueryBuilder;
