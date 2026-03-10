@@ -22,6 +22,16 @@ class QueryBuilder<T> {
 
     return this;
   }
+
+  // Filter based on query parameters (excluding special fields)
+  filter(): this {
+    const queryObj = { ...this.query };
+    const excludedFields = ["searchTerm", "sort", "fields", "page", "limit"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    this.modelQuery = this.modelQuery.find(queryObj);
+    return this;
+  }
 }
 
 export default QueryBuilder;
