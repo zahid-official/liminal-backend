@@ -45,7 +45,7 @@ const createUser = async (payload: IUser, password: string) => {
 
 // Get all users
 const getAllUsers = async (query: Record<string, unknown>) => {
-  const searchFields = ["name", "email", "adress", "phone"];
+  const searchFields = ["name", "email", "address", "phone"];
 
   // Build the query using the QueryBuilder utility
   const queryBuilder = new QueryBuilder<IUser>(User.find(), query)
@@ -55,8 +55,13 @@ const getAllUsers = async (query: Record<string, unknown>) => {
     .fields()
     .paginate();
 
-  const users = await queryBuilder.modelQuery;
-  return users;
+  // Execute the query and get results along with pagination metadata
+  const data = await queryBuilder.modelQuery.select("-password");
+  const meta = await queryBuilder.meta();
+  return {
+    data,
+    meta,
+  };
 };
 
 // Get single user

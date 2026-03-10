@@ -1,4 +1,5 @@
 import type { Query } from "mongoose";
+import type { IMeta } from "./sendResponse.js";
 
 // Utility class to build Mongoose queries based on request query parameters
 class QueryBuilder<T> {
@@ -62,6 +63,23 @@ class QueryBuilder<T> {
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
     return this;
+  }
+
+  // Get the pagination metadata
+  async meta(): Promise<IMeta> {
+    const allQueries = this.modelQuery.getFilter();
+
+    const totalDocs = await this.modelQuery.model.countDocuments(allQueries);
+    const page = Number(this.query?.page) || 1;
+    const limit = Number(this.query?.limit) || 9;
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    return {
+      page,
+      limit,
+      totalPage: totalPages,
+      totalDocs,
+    };
   }
 }
 
