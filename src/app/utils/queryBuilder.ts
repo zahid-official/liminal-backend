@@ -1,5 +1,6 @@
 import type { Query } from "mongoose";
 
+// Utility class to build Mongoose queries based on request query parameters
 class QueryBuilder<T> {
   constructor(
     public modelQuery: Query<T[], T>,
@@ -14,9 +15,12 @@ class QueryBuilder<T> {
     const searchTerm = this.query?.searchTerm;
     if (searchTerm && typeof searchTerm === "string") {
       this.modelQuery = this.modelQuery.find({
-        $or: searchFields?.map((field) => ({
-          [field]: { $regex: searchTerm, $options: "i" },
-        })),
+        $or: searchFields?.map(
+          (field) =>
+            ({
+              [field]: { $regex: searchTerm, $options: "i" },
+            }) as any,
+        ),
       });
     }
 

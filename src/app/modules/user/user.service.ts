@@ -7,6 +7,7 @@ import { httpStatus } from "../../imports/index.js";
 import type { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import { cloudinaryDelete } from "../../configs/cloudinary.js";
+import QueryBuilder from "../../utils/queryBuilder.js";
 
 // Create user
 const createUser = async (payload: IUser, password: string) => {
@@ -43,8 +44,18 @@ const createUser = async (payload: IUser, password: string) => {
 };
 
 // Get all users
-const getAllUsers = async () => {
-  const users = await User.find().select("-password");
+const getAllUsers = async (query: Record<string, unknown>) => {
+  const searchFields = ["name", "email", "adress", "phone"];
+
+  // Build the query using the QueryBuilder utility
+  const queryBuilder = new QueryBuilder<IUser>(User.find(), query)
+    .search(searchFields)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+
+  const users = await queryBuilder.modelQuery;
   return users;
 };
 
