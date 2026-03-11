@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import envVars from "../configs/index.js";
-import { httpStatus } from "../imports/index.js";
-import { cloudinaryDelete } from "../configs/cloudinary.js";
+import envVars from "../config/index.js";
+import { httpStatus } from "../import/index.js";
+import { cloudinaryDelete } from "../config/cloudinary.js";
 
 // globalErrorHandler Function
 const globalErrorHandler = async (

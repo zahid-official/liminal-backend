@@ -1,7 +1,7 @@
 import { Router } from "express";
 import AuthController from "./auth.controller.js";
 import passport from "passport";
-import envVars from "../../configs/index.js";
+import envVars from "../../config/index.js";
 
 // Initialize router
 const router = Router();

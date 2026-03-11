@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { httpStatus } from "../imports/index.js";
+import { httpStatus } from "../import/index.js";
 
 // NotFoundErrorHandler Function
 const notFoundErrorHandler = (req: Request, res: Response) => {

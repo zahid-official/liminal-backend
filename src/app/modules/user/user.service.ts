@@ -1,13 +1,13 @@
 import bcrypt from "bcryptjs";
-import { Role, type IAuthProvider, type IUser } from "./user.interface.js";
-import envVars from "../../configs/index.js";
-import User from "./user.model.js";
-import AppError from "../../errors/AppError.js";
-import { httpStatus } from "../../imports/index.js";
 import type { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
-import { cloudinaryDelete } from "../../configs/cloudinary.js";
-import QueryBuilder from "../../utils/queryBuilder.js";
+import { cloudinaryDelete } from "../../config/cloudinary.js";
+import envVars from "../../config/index.js";
+import AppError from "../../error/AppError.js";
+import { httpStatus } from "../../import/index.js";
+import QueryBuilder from "../../utils/QueryBuilder.js";
+import { Role, type IAuthProvider, type IUser } from "./user.interface.js";
+import User from "./user.model.js";
 
 // Create user
 const createUser = async (payload: IUser, password: string) => {

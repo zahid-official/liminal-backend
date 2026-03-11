@@ -1,5 +1,5 @@
 import type { CookieOptions, Response } from "express";
-import envVars from "../configs/index.js";
+import envVars from "../config/index.js";
 
 // Auth tokens interface
 interface IAuthTokens {

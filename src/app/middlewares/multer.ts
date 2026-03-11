@@ -1,6 +1,6 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "../configs/cloudinary.js";
+import cloudinary from "../config/cloudinary.js";
 import type { Request } from "express";
 
 // Configure multer-storage to use cloudinary

@@ -1,4 +1,4 @@
-import envVars from "../configs/index.js";
+import envVars from "../config/index.js";
 import type { IUser } from "../modules/user/user.interface.js";
 import { generateJWT } from "./jwt.js";
 

@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import type { JwtPayload } from "jsonwebtoken";
-import envVars from "../configs/index.js";
-import AppError from "../errors/AppError.js";
-import { httpStatus } from "../imports/index.js";
+import envVars from "../config/index.js";
+import AppError from "../error/AppError.js";
+import { httpStatus } from "../import/index.js";
 import { AccountStatus } from "../modules/user/user.interface.js";
 import User from "../modules/user/user.model.js";
 import catchAsync from "../utils/catchAsync.js";

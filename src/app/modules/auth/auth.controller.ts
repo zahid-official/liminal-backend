@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync.js";
 import passport from "passport";
-import AppError from "../../errors/AppError.js";
-import { httpStatus } from "../../imports/index.js";
+import AppError from "../../error/AppError.js";
+import { httpStatus } from "../../import/index.js";
 import getTokens from "../../utils/getTokens.js";
 import { clearCookies, setCookies } from "../../utils/cookies.js";
 import sendResponse from "../../utils/sendResponse.js";
-import envVars from "../../configs/index.js";
+import envVars from "../../config/index.js";
 
 // Google login
 const googleLogin = catchAsync(

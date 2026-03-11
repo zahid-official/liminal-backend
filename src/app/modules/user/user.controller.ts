@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { httpStatus } from "../../imports/index.js";
+import { httpStatus } from "../../import/index.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import type { IUser } from "./user.interface.js";
