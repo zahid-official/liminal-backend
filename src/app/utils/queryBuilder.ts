@@ -1,22 +1,24 @@
 import type { Query } from "mongoose";
+import type { IMeta } from "./sendResponse.js";
 
+// Utility class to build Mongoose queries based on request query parameters
 class QueryBuilder<T> {
   constructor(
-    public modelQuery: Query<T[], T>,
-    public readonly query: Record<string, any>,
-  ) {
-    this.modelQuery = modelQuery;
-    this.query = query;
-  }
+    private modelQuery: Query<T[], T>,
+    public readonly query: Record<string, unknown>,
+  ) {}
 
   // Search by term in specified fields
   search(searchFields: string[]): this {
     const searchTerm = this.query?.searchTerm;
     if (searchTerm && typeof searchTerm === "string") {
       this.modelQuery = this.modelQuery.find({
-        $or: searchFields?.map((field) => ({
-          [field]: { $regex: searchTerm, $options: "i" },
-        })),
+        $or: searchFields?.map(
+          (field) =>
+            ({
+              [field]: { $regex: searchTerm, $options: "i" },
+            }) as any,
+        ),
       });
     }
 
@@ -58,6 +60,28 @@ class QueryBuilder<T> {
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
     return this;
+  }
+
+  // Return the built query for execution
+  build(): Query<T[], T> {
+    return this.modelQuery;
+  }
+
+  // Get the pagination metadata
+  async meta(): Promise<IMeta> {
+    const allQueries = this.modelQuery.getFilter();
+
+    const totalDocs = await this.modelQuery.model.countDocuments(allQueries);
+    const page = Number(this.query?.page) || 1;
+    const limit = Number(this.query?.limit) || 9;
+    const totalPage = Math.ceil(totalDocs / limit);
+
+    return {
+      page,
+      limit,
+      total: totalDocs,
+      totalPage,
+    };
   }
 }
 

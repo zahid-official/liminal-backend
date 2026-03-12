@@ -28,7 +28,7 @@ export interface IUser {
   createdAt?: Date;
   isDeleted?: boolean;
   isVerified?: boolean;
-  auth: IAuthProvider[];
+  auths: IAuthProvider[];
   role: Role;
   status: AccountStatus;
 }

@@ -1,7 +1,14 @@
 import { Router } from "express";
 import AuthController from "./auth.controller.js";
 import passport from "passport";
-import envVars from "../../configs/index.js";
+import envVars from "../../config/index.js";
+import schemaValidator from "../../middlewares/schemaValidator.js";
+import {
+  changePasswordZodSchema,
+  setPasswordZodSchema,
+} from "./auth.validation.js";
+import authGuard from "../../middlewares/authGuard.js";
+import { Role } from "../user/user.interface.js";
 
 // Initialize router
 const router = Router();
@@ -19,6 +26,21 @@ router.get(
 // Post routes
 router.post("/login", AuthController.credentialsLogin);
 router.post("/logout", AuthController.logout);
+router.post("/regenerate-token", AuthController.regenerateAccessToken);
+
+// Patch routes
+router.patch(
+  "/set-password",
+  authGuard(...Object.values(Role)),
+  schemaValidator(setPasswordZodSchema),
+  AuthController.setPassword,
+);
+router.patch(
+  "/change-password",
+  authGuard(...Object.values(Role)),
+  schemaValidator(changePasswordZodSchema),
+  AuthController.changePassword,
+);
 
 // Export auth routes
 const AuthRoutes: Router = router;

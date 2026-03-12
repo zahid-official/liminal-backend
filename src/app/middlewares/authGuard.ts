@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import type { JwtPayload } from "jsonwebtoken";
-import envVars from "../configs/index.js";
-import AppError from "../errors/AppError.js";
-import { httpStatus } from "../imports/index.js";
+import envVars from "../config/index.js";
+import AppError from "../error/AppError.js";
+import { httpStatus } from "../import/index.js";
 import { AccountStatus } from "../modules/user/user.interface.js";
 import User from "../modules/user/user.model.js";
 import catchAsync from "../utils/catchAsync.js";
@@ -11,7 +11,7 @@ import { verifyJWT } from "../utils/jwt.js";
 // It's a high-order function that returns a authGuard middleware function
 const authGuard = (...allowedRoles: string[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    //
+    // Extract the access token from cookies
     const accessToken = req?.cookies?.accessToken;
     if (!accessToken) {
       throw new AppError(
@@ -20,7 +20,7 @@ const authGuard = (...allowedRoles: string[]) => {
       );
     }
 
-    //
+    // Verify the access token
     const verifiedToken = verifyJWT(
       accessToken,
       envVars.JWT.ACCESS_SECRET,
@@ -32,7 +32,7 @@ const authGuard = (...allowedRoles: string[]) => {
       );
     }
 
-    // 
+    // Check if user exists
     const user = await User.findOne({
       email: verifiedToken?.email,
     });

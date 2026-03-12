@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
-import envVars from "../configs/index.js";
-import AppError from "../errors/AppError.js";
-import { httpStatus } from "../imports/index.js";
+import envVars from "./index.js";
+import AppError from "../error/AppError.js";
+import { httpStatus } from "../import/index.js";
 
 // Configure cloudinary
 cloudinary.config({

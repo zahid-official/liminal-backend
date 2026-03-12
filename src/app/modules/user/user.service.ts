@@ -1,12 +1,13 @@
 import bcrypt from "bcryptjs";
-import { Role, type IAuthProvider, type IUser } from "./user.interface.js";
-import envVars from "../../configs/index.js";
-import User from "./user.model.js";
-import AppError from "../../errors/AppError.js";
-import { httpStatus } from "../../imports/index.js";
 import type { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
-import { cloudinaryDelete } from "../../configs/cloudinary.js";
+import { cloudinaryDelete } from "../../config/cloudinary.js";
+import envVars from "../../config/index.js";
+import AppError from "../../error/AppError.js";
+import { httpStatus } from "../../import/index.js";
+import QueryBuilder from "../../utils/QueryBuilder.js";
+import { Role, type IAuthProvider, type IUser } from "./user.interface.js";
+import User from "./user.model.js";
 
 // Create user
 const createUser = async (payload: IUser, password: string) => {
@@ -35,7 +36,7 @@ const createUser = async (payload: IUser, password: string) => {
   const user = await User.create({
     ...payload,
     password: hashedPassword,
-    auth: [authProvider],
+    auths: [authProvider],
   });
 
   const { password: _password, ...result } = user.toObject();
@@ -43,9 +44,27 @@ const createUser = async (payload: IUser, password: string) => {
 };
 
 // Get all users
-const getAllUsers = async () => {
-  const users = await User.find().select("-password");
-  return users;
+const getAllUsers = async (query: Record<string, unknown>) => {
+  const searchFields = ["name", "email", "address", "phone"];
+
+  // Build the query using the QueryBuilder utility
+  const queryBuilder = new QueryBuilder<IUser>(User.find(), query);
+
+  // Execute the query and get results along with pagination metadata
+  const data = await queryBuilder
+    .search(searchFields)
+    .filter()
+    .sort()
+    .fields()
+    .paginate()
+    .build()
+    .select("-password");
+
+  const meta = await queryBuilder.meta();
+  return {
+    data,
+    meta,
+  };
 };
 
 // Get single user
