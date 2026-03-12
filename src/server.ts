@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 import type { Server } from "http";
 import mongoose from "mongoose";
-import envVars from "./app/configs/index.js";
+import envVars from "./app/config/index.js";
 import app from "./app.js";
+import seedAdmin from "./app/utils/seedAdmin.js";
 
 let server: Server;
 const port = envVars.PORT || 5000;
@@ -10,10 +11,15 @@ const port = envVars.PORT || 5000;
 // Initialize the server and connect to the database
 const bootstrap = async () => {
   try {
+    // Connect to MongoDB using Mongoose
     await mongoose.connect(envVars.DB_URL);
 
+    // Seed the default admin user if it doesn't exist
+    await seedAdmin();
+
+    // Start the Express server
     server = app.listen(port, () => {
-      console.log(`🚀 Server is running on http://localhost:${envVars.PORT}`);
+      console.log(`🚀 Server is running on http://localhost:${port}`);
       console.log(`⚙️  Environment: ${envVars.NODE_ENV}`);
     });
   } catch (error) {
@@ -26,7 +32,7 @@ const bootstrap = async () => {
   }
 };
 
-// Start the server
+// Start the application
 bootstrap();
 
 // Graceful shutdown handler

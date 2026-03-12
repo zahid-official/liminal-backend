@@ -5,11 +5,11 @@ import express, {
   type Request,
   type Response,
 } from "express";
-import envVars from "./app/configs/index.js";
+import envVars from "./app/config/index.js";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler.js";
 import notFoundErrorHandler from "./app/middlewares/notFoundErrorHandler.js";
 import ModuleRouter from "./app/routes/index.js";
-import "./app/configs/passport.js";
+import "./app/config/passport.js";
 import session from "express-session";
 import passport from "passport";
 

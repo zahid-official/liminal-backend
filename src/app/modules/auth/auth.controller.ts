@@ -1,12 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync.js";
 import passport from "passport";
-import AppError from "../../errors/AppError.js";
-import { httpStatus } from "../../imports/index.js";
+import AppError from "../../error/AppError.js";
+import { httpStatus } from "../../import/index.js";
 import getTokens from "../../utils/getTokens.js";
 import { clearCookies, setCookies } from "../../utils/cookies.js";
 import sendResponse from "../../utils/sendResponse.js";
-import envVars from "../../configs/index.js";
+import envVars from "../../config/index.js";
+import AuthService from "./auth.service.js";
 
 // Google login
 const googleLogin = catchAsync(
@@ -136,12 +137,68 @@ const logout = catchAsync(
   },
 );
 
+// Regenerate access token
+const regenerateAccessToken = catchAsync(
+  async (req: Request, res: Response) => {
+    const refreshToken = req?.cookies?.refreshToken;
+    const result = await AuthService.regenerateAccessToken(refreshToken);
+
+    // Set access-token cookie
+    setCookies(res, result);
+
+    // Send response
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Access token regenerated successfully",
+      data: null,
+    });
+  },
+);
+
+// Set password
+const setPassword = catchAsync(async (req: Request, res: Response) => {
+  const password = req?.body?.password;
+  const userId = req?.decodedToken?.userId;
+  const result = await AuthService.setPassword(userId, password);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password set successfully",
+    data: result,
+  });
+});
+
+// Change password
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const userId = req?.decodedToken?.userId;
+  const { currentPassword, newPassword } = req?.body || {};
+  const result = await AuthService.changePassword(
+    userId,
+    currentPassword,
+    newPassword,
+  );
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password changed successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   googleLogin,
   googleLoginCallback,
   credentialsLogin,
   logout,
+  regenerateAccessToken,
+  setPassword,
+  changePassword,
 };
 
 export default AuthController;

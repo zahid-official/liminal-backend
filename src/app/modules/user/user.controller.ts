@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { httpStatus } from "../../imports/index.js";
+import { httpStatus } from "../../import/index.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import type { IUser } from "./user.interface.js";
@@ -21,14 +21,16 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
 // Get all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getAllUsers();
+  const query = req.query;
+  const result = await UserService.getAllUsers(query);
 
   // Send response
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Users retrieved successfully",
-    data: result,
+    data: result.data,
+    meta: result.meta,
   });
 });
 
