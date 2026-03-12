@@ -7,6 +7,7 @@ import getTokens from "../../utils/getTokens.js";
 import { clearCookies, setCookies } from "../../utils/cookies.js";
 import sendResponse from "../../utils/sendResponse.js";
 import envVars from "../../config/index.js";
+import AuthService from "./auth.service.js";
 
 // Google login
 const googleLogin = catchAsync(
@@ -136,12 +137,32 @@ const logout = catchAsync(
   },
 );
 
+// Regenerate access token
+const regenerateAccessToken = catchAsync(
+  async (req: Request, res: Response) => {
+    const refreshToken = req?.cookies?.refreshToken;
+    const result = await AuthService.regenerateAccessToken(refreshToken);
+
+    // Set access-token cookie
+    setCookies(res, result);
+
+    // Send response
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Access token regenerated successfully",
+      data: null,
+    });
+  },
+);
+
 // Auth controller object
 const AuthController = {
   googleLogin,
   googleLoginCallback,
   credentialsLogin,
   logout,
+  regenerateAccessToken,
 };
 
 export default AuthController;

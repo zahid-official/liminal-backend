@@ -19,6 +19,7 @@ router.get(
 // Post routes
 router.post("/login", AuthController.credentialsLogin);
 router.post("/logout", AuthController.logout);
+router.post("/regenerate-token", AuthController.regenerateAccessToken);
 
 // Export auth routes
 const AuthRoutes: Router = router;

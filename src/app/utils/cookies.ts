@@ -4,7 +4,7 @@ import envVars from "../config/index.js";
 // Auth tokens interface
 interface IAuthTokens {
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
 }
 
 // Cookie options
