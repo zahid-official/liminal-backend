@@ -11,7 +11,7 @@ import { verifyJWT } from "../utils/jwt.js";
 // It's a high-order function that returns a authGuard middleware function
 const authGuard = (...allowedRoles: string[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    //
+    // Extract the access token from cookies
     const accessToken = req?.cookies?.accessToken;
     if (!accessToken) {
       throw new AppError(
@@ -20,7 +20,7 @@ const authGuard = (...allowedRoles: string[]) => {
       );
     }
 
-    //
+    // Verify the access token
     const verifiedToken = verifyJWT(
       accessToken,
       envVars.JWT.ACCESS_SECRET,
@@ -32,7 +32,7 @@ const authGuard = (...allowedRoles: string[]) => {
       );
     }
 
-    // 
+    // Check if user exists
     const user = await User.findOne({
       email: verifiedToken?.email,
     });
