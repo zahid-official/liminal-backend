@@ -1,0 +1,27 @@
+import z from "zod";
+
+// Zod scheme for set password
+export const setPasswordZodSchema = z.object({
+  // Password
+  password: z
+    .string({
+      error: (issue) =>
+        issue.input === undefined
+          ? "New password is required"
+          : "New password must be string",
+    })
+    .min(8, { error: "New password must be at least 8 characters long." })
+    .trim()
+
+    // Password complexity requirements
+    .regex(/^(?=.*[A-Z])/, {
+      error: "New password must contain at least 1 uppercase letter.",
+    })
+    .regex(/^(?=.*[!@#$%^&*])/, {
+      error: "New password must contain at least 1 special character.",
+    })
+    .regex(/^(?=.*\d)/, {
+      error: "New password must contain at least 1 number.",
+    })
+    .trim(),
+});

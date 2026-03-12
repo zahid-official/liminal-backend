@@ -156,6 +156,21 @@ const regenerateAccessToken = catchAsync(
   },
 );
 
+// Set password
+const setPassword = catchAsync(async (req: Request, res: Response) => {
+  const password = req?.body?.password;
+  const userId = req?.decodedToken?.userId;
+  const result = await AuthService.setPassword(userId, password);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password set successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   googleLogin,
@@ -163,6 +178,7 @@ const AuthController = {
   credentialsLogin,
   logout,
   regenerateAccessToken,
+  setPassword,
 };
 
 export default AuthController;

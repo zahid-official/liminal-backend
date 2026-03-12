@@ -2,6 +2,8 @@ import { Router } from "express";
 import AuthController from "./auth.controller.js";
 import passport from "passport";
 import envVars from "../../config/index.js";
+import schemaValidator from "../../middlewares/schemaValidator.js";
+import { setPasswordZodSchema } from "./auth.validation.js";
 
 // Initialize router
 const router = Router();
@@ -20,6 +22,13 @@ router.get(
 router.post("/login", AuthController.credentialsLogin);
 router.post("/logout", AuthController.logout);
 router.post("/regenerate-token", AuthController.regenerateAccessToken);
+
+// Patch routes
+router.patch(
+  "/set-password",
+  schemaValidator(setPasswordZodSchema),
+  AuthController.setPassword,
+);
 
 // Export auth routes
 const AuthRoutes: Router = router;
