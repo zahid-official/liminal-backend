@@ -3,7 +3,10 @@ import AuthController from "./auth.controller.js";
 import passport from "passport";
 import envVars from "../../config/index.js";
 import schemaValidator from "../../middlewares/schemaValidator.js";
-import { setPasswordZodSchema } from "./auth.validation.js";
+import {
+  changePasswordZodSchema,
+  setPasswordZodSchema,
+} from "./auth.validation.js";
 import authGuard from "../../middlewares/authGuard.js";
 import { Role } from "../user/user.interface.js";
 
@@ -31,6 +34,12 @@ router.patch(
   authGuard(...Object.values(Role)),
   schemaValidator(setPasswordZodSchema),
   AuthController.setPassword,
+);
+router.patch(
+  "/change-password",
+  authGuard(...Object.values(Role)),
+  schemaValidator(changePasswordZodSchema),
+  AuthController.changePassword,
 );
 
 // Export auth routes

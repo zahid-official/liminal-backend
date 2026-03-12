@@ -171,6 +171,25 @@ const setPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Change password
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const userId = req?.decodedToken?.userId;
+  const { currentPassword, newPassword } = req?.body || {};
+  const result = await AuthService.changePassword(
+    userId,
+    currentPassword,
+    newPassword,
+  );
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password changed successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   googleLogin,
@@ -179,6 +198,7 @@ const AuthController = {
   logout,
   regenerateAccessToken,
   setPassword,
+  changePassword,
 };
 
 export default AuthController;
