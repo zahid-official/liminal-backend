@@ -29,7 +29,7 @@ const userSchema = new Schema<IUser>(
     picture: { type: String },
     isDeleted: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
-    auth: [authSchema],
+    auths: [authSchema],
     role: {
       type: String,
       enum: Object.values(Role),

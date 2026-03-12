@@ -68,22 +68,25 @@ const setPassword = async (userId: string, password: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
-  // Check if user has credentials auth provider, if not then they cannot set password
+  // Check if user has credentials auth provider
   if (
-    !user.auth.some((auth) => auth.provider === "google") &&
-    user.auth.some((auth) => auth.provider === "credentials")
+    !user.auths.some((auth) => auth.provider === "google") &&
+    user.auths.some((auth) => auth.provider === "credentials")
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Only users without credentials auth provider can set password",
+      "Only users with google auth provider can set password",
     );
   }
 
-  // Check if user has google auth provider, if yes then they cannot set password
-  if (user?.password && user?.auth.some((auth) => auth.provider === "google")) {
+  // Check if password is already set for users with google auth provider
+  if (
+    user?.password &&
+    user?.auths.some((auth) => auth.provider === "google")
+  ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Only users without google auth provider can set password",
+      "Password is already set for this google account. Please login using credentials or google auth provider.",
     );
   }
 
@@ -101,7 +104,7 @@ const setPassword = async (userId: string, password: string) => {
 
   // Update user with new password and auth provider
   user.password = hashedPassword;
-  user.auth.push(authProvider);
+  user.auths.push(authProvider);
   await user.save();
 
   return user;

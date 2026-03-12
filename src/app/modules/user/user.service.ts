@@ -36,7 +36,7 @@ const createUser = async (payload: IUser, password: string) => {
   const user = await User.create({
     ...payload,
     password: hashedPassword,
-    auth: [authProvider],
+    auths: [authProvider],
   });
 
   const { password: _password, ...result } = user.toObject();

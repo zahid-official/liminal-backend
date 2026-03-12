@@ -36,6 +36,17 @@ passport.use(
           });
         }
 
+        // Check user authentication method
+        if (
+          user?.auths.some((auth) => auth.provider === "google") &&
+          !user?.password
+        ) {
+          return done(null, false, {
+            message:
+              "Please log in with Google first and set a password to enable credentials login.",
+          });
+        }
+
         // Compare the provided password with the stored hashed password
         const isPasswordMatched = await bcrypt.compare(
           password,
@@ -108,7 +119,12 @@ passport.use(
             role: Role.USER,
             isVerified: true,
             picture: profilePicture ?? "",
-            auth: [{ provider: "google", providerId: googleId }],
+            auths: [
+              {
+                provider: "google",
+                providerId: googleId,
+              },
+            ],
           };
 
           // Create the user in the database

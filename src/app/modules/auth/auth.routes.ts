@@ -4,6 +4,8 @@ import passport from "passport";
 import envVars from "../../config/index.js";
 import schemaValidator from "../../middlewares/schemaValidator.js";
 import { setPasswordZodSchema } from "./auth.validation.js";
+import authGuard from "../../middlewares/authGuard.js";
+import { Role } from "../user/user.interface.js";
 
 // Initialize router
 const router = Router();
@@ -26,6 +28,7 @@ router.post("/regenerate-token", AuthController.regenerateAccessToken);
 // Patch routes
 router.patch(
   "/set-password",
+  authGuard(...Object.values(Role)),
   schemaValidator(setPasswordZodSchema),
   AuthController.setPassword,
 );

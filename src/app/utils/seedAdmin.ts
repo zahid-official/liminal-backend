@@ -29,7 +29,7 @@ const seedAdmin = async () => {
       password: hashedPassword,
       role: Role.ADMIN,
       isVerified: true,
-      auth: [
+      auths: [
         { provider: "credentials", providerId: envVars.DEFAULT_ADMIN_EMAIL },
       ],
     };
