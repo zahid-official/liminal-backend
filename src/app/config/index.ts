@@ -31,6 +31,14 @@ interface EnvConfig {
     API_SECRET: string;
     CLOUD_NAME: string;
   };
+
+  SMTP: {
+    HOST: string;
+    PORT: number;
+    USER: string;
+    PASS: string;
+    FROM: string;
+  };
 }
 
 // requiredEnvs Function
@@ -59,6 +67,12 @@ const requiredEnvs = (): EnvConfig => {
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_API_SECRET",
     "CLOUDINARY_CLOUD_NAME",
+
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS",
+    "SMTP_FROM",
   ];
 
   // Check if all required environment variables are defined
@@ -112,6 +126,14 @@ const requiredEnvs = (): EnvConfig => {
       API_KEY: process.env.CLOUDINARY_API_KEY as string,
       API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
       CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+    },
+
+    SMTP: {
+      HOST: process.env.SMTP_HOST as string,
+      PORT: assertNumber(process.env.SMTP_PORT as string, "SMTP_PORT"),
+      USER: process.env.SMTP_USER as string,
+      PASS: process.env.SMTP_PASS as string,
+      FROM: process.env.SMTP_FROM as string,
     },
   };
 };
