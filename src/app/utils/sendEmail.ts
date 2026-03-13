@@ -1,3 +1,5 @@
+import ejs from "ejs";
+import path from "node:path";
 import { createTransport } from "nodemailer";
 import envVars from "../config/index.js";
 import AppError from "../error/AppError.js";
@@ -8,7 +10,8 @@ import type { Attachment } from "nodemailer/lib/mailer/index.js";
 interface EmailOptions {
   to: string;
   subject: string;
-  html: string;
+  templateName: string;
+  templateData?: Record<string, any>;
   attachments?: Attachment[];
 }
 
@@ -26,18 +29,24 @@ const transporter = createTransport({
 // Function to send email
 const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
+    // Render email template
+    const templatePath = path.join(
+      process.cwd(),
+      "src/app/utils/templates",
+      `${options.templateName}.ejs`,
+    );
+    const html = await ejs.renderFile(templatePath, options.templateData);
+
+    // Define mail options
     const mailOptions = {
       from: envVars.SMTP.FROM,
       to: options.to,
       subject: options.subject,
-      html: options.html,
-      attachments: options?.attachments?.map((attachment) => ({
-        filename: attachment.filename,
-        content: attachment.content,
-        contentType: attachment.contentType,
-      })),
+      html,
+      attachments: options?.attachments,
     };
 
+    // Send email
     await transporter.sendMail(mailOptions);
   } catch (error: any) {
     throw new AppError(
