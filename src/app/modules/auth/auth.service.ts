@@ -1,12 +1,12 @@
+import bcrypt from "bcryptjs";
 import type { JwtPayload } from "jsonwebtoken";
 import envVars from "../../config/index.js";
 import AppError from "../../error/AppError.js";
 import { httpStatus } from "../../import/index.js";
-import { regenerateToken } from "../../utils/getTokens.js";
+import { generateResetToken, regenerateToken } from "../../utils/getTokens.js";
 import { verifyJWT } from "../../utils/jwt.js";
 import { AccountStatus, type IAuthProvider } from "../user/user.interface.js";
 import User from "../user/user.model.js";
-import bcrypt from "bcryptjs";
 
 // Regenerate access token using refresh token
 const regenerateAccessToken = async (refreshToken: string) => {
@@ -157,11 +157,41 @@ const changePassword = async (
   return null;
 };
 
+// Forgot password
+const forgotPassword = async (email: string) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if user is deleted
+  if (user.isDeleted) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is deleted. Please contact support for more information.",
+    );
+  }
+
+  // Check if user is blocked
+  if (user.status === AccountStatus.BLOCKED) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      `User is ${user.status}. Please contact support for more information.`,
+    );
+  }
+
+  // Generate reset token
+  const resetToken = generateResetToken(user);
+
+  return null;
+};
+
 // Auth service object
 const AuthService = {
   regenerateAccessToken,
   setPassword,
   changePassword,
+  forgotPassword,
 };
 
 export default AuthService;

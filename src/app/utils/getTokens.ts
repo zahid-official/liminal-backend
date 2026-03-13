@@ -42,4 +42,15 @@ export const regenerateToken = (user: Partial<IUser>) => {
   return { accessToken };
 };
 
+export const generateResetToken = (user: Partial<IUser>) => {
+  // Generate Access Token
+  const resetToken = generateJWT(
+    getJwtPayload(user),
+    envVars.JWT.ACCESS_SECRET,
+    "10m",
+  );
+
+  return resetToken;
+};
+
 export default getTokens;

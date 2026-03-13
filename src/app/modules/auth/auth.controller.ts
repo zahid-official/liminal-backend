@@ -190,6 +190,20 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Forgot password
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  const email = req?.body?.email;
+  const result = await AuthService.forgotPassword(email);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password reset email sent successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   googleLogin,
@@ -199,6 +213,7 @@ const AuthController = {
   regenerateAccessToken,
   setPassword,
   changePassword,
+  forgotPassword,
 };
 
 export default AuthController;

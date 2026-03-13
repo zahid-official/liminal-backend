@@ -5,6 +5,7 @@ import envVars from "../../config/index.js";
 import schemaValidator from "../../middlewares/schemaValidator.js";
 import {
   changePasswordZodSchema,
+  forgotPasswordZodSchema,
   setPasswordZodSchema,
 } from "./auth.validation.js";
 import authGuard from "../../middlewares/authGuard.js";
@@ -40,6 +41,11 @@ router.patch(
   authGuard(...Object.values(Role)),
   schemaValidator(changePasswordZodSchema),
   AuthController.changePassword,
+);
+router.patch(
+  "/forgot-password",
+  schemaValidator(forgotPasswordZodSchema),
+  AuthController.forgotPassword,
 );
 
 // Export auth routes
