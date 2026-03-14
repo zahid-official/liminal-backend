@@ -39,6 +39,13 @@ interface EnvConfig {
     PASS: string;
     FROM: string;
   };
+
+  REDIS: {
+    USERNAME: string;
+    PASSWORD: string;
+    HOST: string;
+    PORT: number;
+  };
 }
 
 // requiredEnvs Function
@@ -73,6 +80,11 @@ const requiredEnvs = (): EnvConfig => {
     "SMTP_USER",
     "SMTP_PASS",
     "SMTP_FROM",
+
+    "REDIS_USERNAME",
+    "REDIS_PASSWORD",
+    "REDIS_HOST",
+    "REDIS_PORT",
   ];
 
   // Check if all required environment variables are defined
@@ -134,6 +146,13 @@ const requiredEnvs = (): EnvConfig => {
       USER: process.env.SMTP_USER as string,
       PASS: process.env.SMTP_PASS as string,
       FROM: process.env.SMTP_FROM as string,
+    },
+
+    REDIS: {
+      USERNAME: process.env.REDIS_USERNAME as string,
+      PASSWORD: process.env.REDIS_PASSWORD as string,
+      HOST: process.env.REDIS_HOST as string,
+      PORT: assertNumber(process.env.REDIS_PORT as string, "REDIS_PORT"),
     },
   };
 };

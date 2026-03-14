@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import envVars from "./app/config/index.js";
 import app from "./app.js";
 import seedAdmin from "./app/utils/seedAdmin.js";
+import { connectRedis } from "./app/config/redis.js";
 
 let server: Server;
 const port = envVars.PORT || 5000;
@@ -11,10 +12,9 @@ const port = envVars.PORT || 5000;
 // Initialize the server and connect to the database
 const bootstrap = async () => {
   try {
-    // Connect to MongoDB using Mongoose
+    // Before starting the server: connect to MongoDB, Redis & seed admin if not exists
     await mongoose.connect(envVars.DB_URL);
-
-    // Seed the default admin user if it doesn't exist
+    await connectRedis();
     await seedAdmin();
 
     // Start the Express server
