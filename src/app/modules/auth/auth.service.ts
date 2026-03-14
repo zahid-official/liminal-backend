@@ -198,12 +198,53 @@ const forgotPassword = async (email: string) => {
   return null;
 };
 
+// Reset password
+const resetPassword = async (
+  userId: string,
+  id: string,
+  newPassword: string,
+) => {
+  if (userId !== id) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Invalid or expired password reset token. Please request again to reset your password.",
+    );
+  }
+
+  // Check if user exists
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if password is set for the user
+  if (!user.password) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Password is not set for this account. Please set a password first.",
+    );
+  }
+
+  // Hash the new password
+  const hashedPassword = await bcrypt.hash(
+    newPassword,
+    envVars.BCRYPT_SALT_ROUNDS,
+  );
+
+  // Update user with new password
+  user.password = hashedPassword;
+  await user.save();
+
+  return null;
+};
+
 // Auth service object
 const AuthService = {
   regenerateAccessToken,
   setPassword,
   changePassword,
   forgotPassword,
+  resetPassword,
 };
 
 export default AuthService;
