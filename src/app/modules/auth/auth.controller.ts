@@ -190,6 +190,35 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Forgot password
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  const email = req?.body?.email;
+  const result = await AuthService.forgotPassword(email);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password reset email sent successfully",
+    data: result,
+  });
+});
+
+// Reset password
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const userId = req?.decodedToken?.userId;
+  const { id, newPassword } = req?.body || {};
+  const result = await AuthService.resetPassword(userId, id, newPassword);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Password reset successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   googleLogin,
@@ -199,6 +228,8 @@ const AuthController = {
   regenerateAccessToken,
   setPassword,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };
 
 export default AuthController;

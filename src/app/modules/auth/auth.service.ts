@@ -1,12 +1,13 @@
+import bcrypt from "bcryptjs";
 import type { JwtPayload } from "jsonwebtoken";
 import envVars from "../../config/index.js";
 import AppError from "../../error/AppError.js";
 import { httpStatus } from "../../import/index.js";
-import { regenerateToken } from "../../utils/getTokens.js";
+import { generateResetToken, regenerateToken } from "../../utils/getTokens.js";
 import { verifyJWT } from "../../utils/jwt.js";
 import { AccountStatus, type IAuthProvider } from "../user/user.interface.js";
 import User from "../user/user.model.js";
-import bcrypt from "bcryptjs";
+import sendEmail from "../../utils/sendEmail.js";
 
 // Regenerate access token using refresh token
 const regenerateAccessToken = async (refreshToken: string) => {
@@ -157,11 +158,93 @@ const changePassword = async (
   return null;
 };
 
+// Forgot password
+const forgotPassword = async (email: string) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if user is deleted
+  if (user.isDeleted) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is deleted. Please contact support for more information.",
+    );
+  }
+
+  // Check if user is blocked
+  if (user.status === AccountStatus.BLOCKED) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      `User is ${user.status}. Please contact support for more information.`,
+    );
+  }
+
+  // Generate reset token
+  const resetToken = generateResetToken(user);
+
+  // Send password reset email
+  await sendEmail({
+    to: user.email,
+    subject: "Password Reset",
+    templateName: "forgotPassword",
+    templateData: {
+      recipientName: user.name,
+      resetUrl: `${envVars.FRONTEND_URL}/reset-password?id=${user._id}&accessToken=${resetToken}`,
+    },
+  });
+
+  return null;
+};
+
+// Reset password
+const resetPassword = async (
+  userId: string,
+  id: string,
+  newPassword: string,
+) => {
+  if (userId !== id) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Invalid or expired password reset token. Please request again to reset your password.",
+    );
+  }
+
+  // Check if user exists
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if password is set for the user
+  if (!user.password) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Password is not set for this account. Please set a password first.",
+    );
+  }
+
+  // Hash the new password
+  const hashedPassword = await bcrypt.hash(
+    newPassword,
+    envVars.BCRYPT_SALT_ROUNDS,
+  );
+
+  // Update user with new password
+  user.password = hashedPassword;
+  await user.save();
+
+  return null;
+};
+
 // Auth service object
 const AuthService = {
   regenerateAccessToken,
   setPassword,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };
 
 export default AuthService;
