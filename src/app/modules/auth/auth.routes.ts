@@ -7,6 +7,7 @@ import {
   changePasswordZodSchema,
   forgotPasswordZodSchema,
   resetPasswordZodSchema,
+  sendOtpZodSchema,
   setPasswordZodSchema,
 } from "./auth.validation.js";
 import authGuard from "../../middlewares/authGuard.js";
@@ -53,6 +54,11 @@ router.patch(
   authGuard(...Object.values(Role)),
   schemaValidator(resetPasswordZodSchema),
   AuthController.resetPassword,
+);
+router.patch(
+  "/send-otp",
+  schemaValidator(sendOtpZodSchema),
+  AuthController.sendOTP,
 );
 
 // Export auth routes

@@ -8,6 +8,7 @@ import { verifyJWT } from "../../utils/jwt.js";
 import { AccountStatus, type IAuthProvider } from "../user/user.interface.js";
 import User from "../user/user.model.js";
 import sendEmail from "../../utils/sendEmail.js";
+import redisClient from "../../config/redis.js";
 
 // Regenerate access token using refresh token
 const regenerateAccessToken = async (refreshToken: string) => {
@@ -238,6 +239,52 @@ const resetPassword = async (
   return null;
 };
 
+// Send OTP for password reset
+const sendOTP = async (email: string) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if user is deleted
+  if (user.isVerified) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User is already verified. Please login to your account.",
+    );
+  }
+
+  // Check if user is blocked
+  if (user.status === AccountStatus.BLOCKED) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      `User is ${user.status}. Please contact support for more information.`,
+    );
+  }
+
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const redisKey = `otp:${email}`;
+
+  // Store OTP in Redis with expiration time of 5 minutes
+  await redisClient.set(redisKey, otp, {
+    expiration: { type: "EX", value: 60 * 5 },
+  });
+
+  // Send OTP email
+  await sendEmail({
+    to: user.email,
+    subject: "OTP for Account Verification - Liminal",
+    templateName: "otp",
+    templateData: {
+      recipientName: user.name,
+      otp,
+    },
+  });
+
+  return null;
+};
+
 // Auth service object
 const AuthService = {
   regenerateAccessToken,
@@ -245,6 +292,7 @@ const AuthService = {
   changePassword,
   forgotPassword,
   resetPassword,
+  sendOTP,
 };
 
 export default AuthService;

@@ -78,7 +78,6 @@ export const forgotPasswordZodSchema = z.object({
     .trim(),
 });
 
-
 // Zod scheme for reset password
 export const resetPasswordZodSchema = z.object({
   // Id
@@ -115,5 +114,20 @@ export const resetPasswordZodSchema = z.object({
     .regex(/^(?=.*\d)/, {
       error: "New password must contain at least 1 number.",
     })
+    .trim(),
+});
+
+// Zod scheme for sending otp
+export const sendOtpZodSchema = z.object({
+  // Email
+  email: z
+    .email({
+      error: (issue) =>
+        issue.input === undefined
+          ? "Email is required"
+          : "Invalid email format",
+    })
+    .min(5, { error: "Email must be at least 5 characters long." })
+    .max(100, { error: "Email cannot exceed 100 characters." })
     .trim(),
 });

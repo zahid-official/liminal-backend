@@ -219,6 +219,20 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Send OTP
+const sendOTP = catchAsync(async (req: Request, res: Response) => {
+  const email = req?.body?.email;
+  const result = await AuthService.sendOTP(email);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "OTP sent successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   googleLogin,
@@ -230,6 +244,7 @@ const AuthController = {
   changePassword,
   forgotPassword,
   resetPassword,
+  sendOTP,
 };
 
 export default AuthController;
