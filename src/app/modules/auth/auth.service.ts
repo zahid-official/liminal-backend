@@ -9,6 +9,7 @@ import { AccountStatus, type IAuthProvider } from "../user/user.interface.js";
 import User from "../user/user.model.js";
 import sendEmail from "../../utils/sendEmail.js";
 import redisClient from "../../config/redis.js";
+import generateOtp from "../../utils/generateOtp.js";
 
 // Regenerate access token using refresh token
 const regenerateAccessToken = async (refreshToken: string) => {
@@ -262,8 +263,8 @@ const sendOTP = async (email: string) => {
     );
   }
 
-  // Generate OTP
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // Generate OTP & create Redis key
+  const otp = generateOtp(6);
   const redisKey = `otp:${email}`;
 
   // Store OTP in Redis with expiration time of 5 minutes
