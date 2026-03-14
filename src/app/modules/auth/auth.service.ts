@@ -7,6 +7,7 @@ import { generateResetToken, regenerateToken } from "../../utils/getTokens.js";
 import { verifyJWT } from "../../utils/jwt.js";
 import { AccountStatus, type IAuthProvider } from "../user/user.interface.js";
 import User from "../user/user.model.js";
+import sendEmail from "../../utils/sendEmail.js";
 
 // Regenerate access token using refresh token
 const regenerateAccessToken = async (refreshToken: string) => {
@@ -182,6 +183,17 @@ const forgotPassword = async (email: string) => {
 
   // Generate reset token
   const resetToken = generateResetToken(user);
+
+  // Send password reset email
+  await sendEmail({
+    to: user.email,
+    subject: "Password Reset",
+    templateName: "forgotPassword",
+    templateData: {
+      recipientName: user.name,
+      resetUrl: `${envVars.FRONTEND_URL}/reset-password?id=${user._id}&accessToken=${resetToken}`,
+    },
+  });
 
   return null;
 };
