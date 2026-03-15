@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync.js";
 import passport from "passport";
+import envVars from "../../config/index.js";
 import AppError from "../../error/AppError.js";
 import { httpStatus } from "../../import/index.js";
-import getTokens from "../../utils/getTokens.js";
+import catchAsync from "../../utils/catchAsync.js";
 import { clearCookies, setCookies } from "../../utils/cookies.js";
+import getTokens from "../../utils/getTokens.js";
 import sendResponse from "../../utils/sendResponse.js";
-import envVars from "../../config/index.js";
 import AuthService from "./auth.service.js";
 
 // Google login
@@ -233,6 +233,20 @@ const sendOTP = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Verify OTP
+const verifyOTP = catchAsync(async (req: Request, res: Response) => {
+  const { email, otp } = req?.body || {};
+  const result = await AuthService.verifyOTP(email, otp);
+
+  // Send response
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "OTP verified successfully",
+    data: result,
+  });
+});
+
 // Auth controller object
 const AuthController = {
   googleLogin,
@@ -245,6 +259,7 @@ const AuthController = {
   forgotPassword,
   resetPassword,
   sendOTP,
+  verifyOTP,
 };
 
 export default AuthController;
