@@ -1,16 +1,18 @@
 import { Router } from "express";
-import AuthController from "./auth.controller.js";
 import passport from "passport";
 import envVars from "../../config/index.js";
+import authGuard from "../../middlewares/authGuard.js";
 import schemaValidator from "../../middlewares/schemaValidator.js";
+import { Role } from "../user/user.interface.js";
+import AuthController from "./auth.controller.js";
 import {
   changePasswordZodSchema,
   forgotPasswordZodSchema,
   resetPasswordZodSchema,
+  sendOtpZodSchema,
   setPasswordZodSchema,
+  verifyOtpZodSchema,
 } from "./auth.validation.js";
-import authGuard from "../../middlewares/authGuard.js";
-import { Role } from "../user/user.interface.js";
 
 // Initialize router
 const router = Router();
@@ -53,6 +55,16 @@ router.patch(
   authGuard(...Object.values(Role)),
   schemaValidator(resetPasswordZodSchema),
   AuthController.resetPassword,
+);
+router.patch(
+  "/send-otp",
+  schemaValidator(sendOtpZodSchema),
+  AuthController.sendOTP,
+);
+router.patch(
+  "/verify-otp",
+  schemaValidator(verifyOtpZodSchema),
+  AuthController.verifyOTP,
 );
 
 // Export auth routes
