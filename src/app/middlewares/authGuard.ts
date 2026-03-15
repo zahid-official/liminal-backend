@@ -48,6 +48,14 @@ const authGuard = (...allowedRoles: string[]) => {
       );
     }
 
+    // Check if user is verified
+    if (!user.isVerified) {
+      throw new AppError(
+        httpStatus.UNAUTHORIZED,
+        "User is not verified. Please verify your email before logging in.",
+      );
+    }
+
     // Check if user is blocked
     if (user.status === AccountStatus.BLOCKED) {
       throw new AppError(

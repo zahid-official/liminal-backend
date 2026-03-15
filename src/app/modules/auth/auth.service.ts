@@ -50,6 +50,14 @@ const regenerateAccessToken = async (refreshToken: string) => {
     );
   }
 
+  // Check if user is verified
+  if (!user.isVerified) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is not verified. Please verify your email before logging in.",
+    );
+  }
+
   // Check if user is blocked
   if (user.status === AccountStatus.BLOCKED) {
     throw new AppError(
@@ -175,6 +183,14 @@ const forgotPassword = async (email: string) => {
     );
   }
 
+  // Check if user is verified
+  if (!user.isVerified) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is not verified. Please verify your email before logging in.",
+    );
+  }
+
   // Check if user is blocked
   if (user.status === AccountStatus.BLOCKED) {
     throw new AppError(
@@ -248,6 +264,14 @@ const sendOTP = async (email: string) => {
   }
 
   // Check if user is deleted
+  if (user.isDeleted) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is deleted. Please contact support for more information.",
+    );
+  }
+
+  // Check if user is already verified
   if (user.isVerified) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -291,6 +315,14 @@ const verifyOTP = async (email: string, otp: string) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if user is deleted
+  if (user.isDeleted) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is deleted. Please contact support for more information.",
+    );
   }
 
   // Check if user is already verified

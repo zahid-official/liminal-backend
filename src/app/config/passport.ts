@@ -23,9 +23,16 @@ passport.use(
         }
 
         // Check if the user is marked as deleted
-        if (user?.isDeleted) {
+        if (user.isDeleted) {
           return done(null, false, {
             message: `User is deleted. Please contact support for more information.`,
+          });
+        }
+
+        // Check if the user's email is verified
+        if (!user.isVerified) {
+          return done(null, false, {
+            message: `Email is not verified. Please verify your email before logging in.`,
           });
         }
 
@@ -101,6 +108,13 @@ passport.use(
         if (user && user.isDeleted) {
           return done(null, false, {
             message: `User is deleted. Please contact support for more information.`,
+          });
+        }
+
+        // Check if the user's email is verified
+        if (user && !user.isVerified) {
+          return done(null, false, {
+            message: `Email is not verified. Please verify your email before logging in.`,
           });
         }
 
