@@ -1,13 +1,15 @@
 import bcrypt from "bcryptjs";
 import type { JwtPayload } from "jsonwebtoken";
 import envVars from "../../config/index.js";
+import redisClient from "../../config/redis.js";
 import AppError from "../../error/AppError.js";
 import { httpStatus } from "../../import/index.js";
+import generateOtp from "../../utils/generateOtp.js";
 import { generateResetToken, regenerateToken } from "../../utils/getTokens.js";
 import { verifyJWT } from "../../utils/jwt.js";
+import sendEmail from "../../utils/sendEmail.js";
 import { AccountStatus, type IAuthProvider } from "../user/user.interface.js";
 import User from "../user/user.model.js";
-import sendEmail from "../../utils/sendEmail.js";
 
 // Regenerate access token using refresh token
 const regenerateAccessToken = async (refreshToken: string) => {
@@ -45,6 +47,14 @@ const regenerateAccessToken = async (refreshToken: string) => {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
       "User is deleted. Please contact support for more information.",
+    );
+  }
+
+  // Check if user is verified
+  if (!user.isVerified) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is not verified. Please verify your email before logging in.",
     );
   }
 
@@ -173,6 +183,14 @@ const forgotPassword = async (email: string) => {
     );
   }
 
+  // Check if user is verified
+  if (!user.isVerified) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is not verified. Please verify your email before logging in.",
+    );
+  }
+
   // Check if user is blocked
   if (user.status === AccountStatus.BLOCKED) {
     throw new AppError(
@@ -238,6 +256,113 @@ const resetPassword = async (
   return null;
 };
 
+// Send OTP
+const sendOTP = async (email: string) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if user is deleted
+  if (user.isDeleted) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is deleted. Please contact support for more information.",
+    );
+  }
+
+  // Check if user is already verified
+  if (user.isVerified) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User is already verified. Please login to your account.",
+    );
+  }
+
+  // Check if user is blocked
+  if (user.status === AccountStatus.BLOCKED) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      `User is ${user.status}. Please contact support for more information.`,
+    );
+  }
+
+  // Generate OTP & create Redis key
+  const otp = generateOtp(6);
+  const redisKey = `otp:${email}`;
+
+  // Store OTP in Redis with expiration time of 5 minutes
+  await redisClient.set(redisKey, otp, {
+    expiration: { type: "EX", value: 60 * 5 },
+  });
+
+  // Send OTP email
+  await sendEmail({
+    to: user.email,
+    subject: "OTP for Account Verification - Liminal",
+    templateName: "otp",
+    templateData: {
+      recipientName: user.name,
+      otp,
+    },
+  });
+
+  return null;
+};
+
+// Verify OTP
+const verifyOTP = async (email: string, otp: string) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // Check if user is deleted
+  if (user.isDeleted) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "User is deleted. Please contact support for more information.",
+    );
+  }
+
+  // Check if user is already verified
+  if (user.isVerified) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User already verified. Please login",
+    );
+  }
+
+  // Check if user is blocked
+  if (user.status === AccountStatus.BLOCKED) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      `User is ${user.status}. Please contact support for more information.`,
+    );
+  }
+
+  // Get OTP from Redis
+  const redisKey = `otp:${email}`;
+  const redisOtp = await redisClient.get(redisKey);
+
+  // Check if OTP exists in Redis and matches the provided OTP
+  if (!redisOtp || redisOtp !== otp) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Invalid or expired OTP. Please request a new OTP and try again.",
+    );
+  }
+
+  // Mark user as verified
+  user.isVerified = true;
+  await user.save();
+
+  // Delete OTP from Redis
+  await redisClient.del(redisKey);
+
+  return null;
+};
+
 // Auth service object
 const AuthService = {
   regenerateAccessToken,
@@ -245,6 +370,8 @@ const AuthService = {
   changePassword,
   forgotPassword,
   resetPassword,
+  sendOTP,
+  verifyOTP,
 };
 
 export default AuthService;
